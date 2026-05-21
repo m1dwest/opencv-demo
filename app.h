@@ -3,6 +3,8 @@
 #include <optional>
 #include <string>
 
+#include "vision/camera.h"
+
 struct GLFWwindow;
 
 namespace app {
@@ -28,14 +30,14 @@ class App {
 
     [[nodiscard]] bool init_window(unsigned width, unsigned height,
                                    std::string title);
-    // Window create_window(int width, int height, std::string&& title,
-    //                      bool is_vsync_enabled);
+    void init_camera(int width, int height, int fps);
 
    private:
     bool _is_vsync_enabled = true;
     bool _is_fullscreen = false;
 
     std::optional<Window> _window;
+    std::optional<vision::Camera> _camera;
 };
 
 }  // namespace app

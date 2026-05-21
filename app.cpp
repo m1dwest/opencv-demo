@@ -8,6 +8,7 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_stdlib.h>
 #include <plog/Log.h>
+#include <librealsense2/rs.hpp>
 
 namespace {
 
@@ -159,32 +160,10 @@ bool App::should_close() const {
 }
 
 void App::update() {
-    // if (_camera.has_value()) {
-    //     auto frame = _camera.value().wait_for_frame(1000);
-    //     _ctx.camera_frame = std::move(frame.color_frame);
-    //
-    //     _calibrator.update(_ctx.camera_frame, _device);
-    //     if (_is_find_line_running) {
-    //         {
-    //             const auto lock =
-    //                 std::lock_guard<std::mutex>(_detections_mutex);
-    //             _snapshots.push_back(
-    //                 Snapshot{.frame = _ctx.camera_frame.clone(),
-    //                          .time_point = frame.time_point});
-    //         }
-    //         _detection_cond.notify_all();
-    //     }
-    //
-    //     if (_ctx.is_inference_enabled) {
-    //         _detections = detect(_thresholds, _ctx.camera_frame);
-    //         vision::render(_detections, _ctx.camera_frame);
-    //     }
-    //
-    //     if (_detection_vis.has_value()) {
-    //         vision::render(*_detection_vis, WELDING_LINE_LABEL, std::nullopt,
-    //                        _ctx.camera_frame);
-    //     }
-    // }
+    if (_camera.has_value()) {
+        auto frame = _camera.value().wait_for_frame(1000);
+        // _ctx.camera_frame = std::move(frame.color_frame);
+    }
 }
 
 void App::compose() {
@@ -244,6 +223,23 @@ bool App::init_window(unsigned width, unsigned height, std::string title) {
     }
 
     return true;
+}
+
+void App::init_camera(int width, int height, int fps) {
+    try {
+        _camera.emplace(width, height, fps);
+
+        // if (const auto exp = _camera->get_exposure(); exp.has_value()) {
+        //     _ctx.camera_exposure = *exp;
+        // }
+
+    } catch (const rs2::error& e) {
+        LOG_ERROR << "Camera initialization failed:";
+        LOG_ERROR << e.what();
+    } catch (std::runtime_error& e) {
+        // TODO: display error
+        LOG_ERROR << e.what();
+    }
 }
 
 }  // namespace app
